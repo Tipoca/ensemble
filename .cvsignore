@@ -1,0 +1,17 @@
+TODO
+CVS
+bin
+lib
+ensemble.ml
+ensemble.mli
+emrg*
+*.exe
+*.cm*
+*.a
+*.o*
+*.lib
+.depend*
+Makefile.top.nt
+Makefile.nt
+.unknown
+.depend*

@@ -1,0 +1,28 @@
+%*************************************************************%
+%
+%    Ensemble, 2_00
+%    Copyright 2004 Cornell University, Hebrew University
+%           IBM Israel Science and Technology
+%    All rights reserved.
+%
+%    See ensemble/doc/license.txt for further information.
+%
+%*************************************************************%
+\section{Csharp Application Interface}
+Apart for minor language differences this API is the same as the Java
+API. 
+
+Locking is slightly different in C-sharp compared with Java. The {\tt
+  lock} keyword is used instead of {\tt synchronized}. An application
+that wants to protect access by several threads to the
+Ensemble-connection should use something like this: 
+\begin{codebox}
+  lock (conn) 
+  \{
+      if (memb.current_status == Member.Status.Normal)
+          memb.Cast("hello world");
+       else
+           Console.WriteLine("Blocked currently, please try again later");
+  \}
+\end{codebox}
+

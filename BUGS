@@ -1,0 +1,23 @@
+#*************************************************************#
+#
+#   Ensemble, 2_00
+#   Copyright 2004 Cornell University, Hebrew University
+#           IBM Israel Science and Technology
+#   All rights reserved.
+#
+#   See ensemble/doc/license.txt for further information.
+#
+#*************************************************************#
+-*- Mode: indented-text -*- 
+Known Ensemble Bugs
+BUGS Author: Mark Hayden
+Last updated: Ohad Rodeh  10/2002
+
+* the groupd application is still not very stable
+  - It does not support SVS
+
+* win32 problems: 
+  1) Multicast does not work on NT very well. 
+     This is an NT problem. On win2000 this is ok. WinXP again, this
+     doesn't work very well. 
+

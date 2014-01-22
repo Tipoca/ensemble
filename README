@@ -1,0 +1,75 @@
+#*************************************************************#
+#
+#   Ensemble, 2_00
+#   Copyright 2004 Cornell University, Hebrew University
+#           IBM Israel Science and Technology
+#   All rights reserved.
+#
+#   See ensemble/doc/license.txt for further information.
+#
+#*************************************************************#
+README: Ensemble Root directory
+Author: Mark Hayden
+Last updated: 26/10/2002, by Ohad Rodeh
+
+  The design of the Ensemble system is based to a large
+  degree on the C implementation of Horus at the Cornell
+  University Computer Science Department, of which Robbert
+  vanRenesse is the chief architect.  I have tried my best
+  to credit the designer(s) of the original C code in
+  modules that are based on the C implementation.  I would
+  appreciate knowing of any instances in which I have
+  improperly or incompletely credited pieces of this system.
+
+  Mark Hayden
+
+Notes:
+
+  * Please read the file INSTALL.htm (from a Web 
+    browser) to find out how to build and install the Ensemble 
+    distribution.  Also please read RELEASE_NOTES for version
+    specific updates.
+
+  * Some of these directories may not appear in various
+    distributions of Ensemble.
+
+FILES
+
+  Makefile	main Makefile
+  INSTALL	installation instructions
+  BUGS		known bugs
+  RELEASE_NOTES what's new for this release
+  LICENSE	Ensemble copyright notice and license
+  CHANGES       What has changed since previous releases.  
+
+DIRECTORIES
+
+  mk		Makefile directory
+  doc		documentation directory
+  util		general purpose utility modules
+  mm            Memory management.
+  type		abstract data types
+  route         intra-process routers
+  infr		infrastructure support
+  appl		support for applications
+  trans		communication transports (UDP, TCP, ...)
+  layers	protocol layers
+  crypto	Cryptographic support (with Ohad Rodeh)
+  groupd	Group daemon directory
+
+  demo		application demos
+  demo/tk	Tcl/Tk application demos (with Robbert vanRenesse)
+  demo/life	Game of Life demo (by Samuel Weber)
+
+  ce            Revised C interface (Ohad Rodeh)
+  cejava        Native Java interface, built on CE (Ohad Rodeh)
+  hot		C application interface (by Alexey Vaysburd)
+  maestro	C++ application interface (by Alexey Vaysburd)
+  ejava		Java application interface (contributed)
+  socket	Ensemble Socket library (with Robbert vanRenesse)
+
+  tools		conversion of makefiles between unix and NT
+	        packaging of ML modules.
+
+  bin           compiled demo programs
+  lib		compiled libraries and interfaces

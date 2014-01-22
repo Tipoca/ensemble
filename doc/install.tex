@@ -1,0 +1,61 @@
+%*************************************************************%
+%
+%    Ensemble, 2_00
+%    Copyright 2004 Cornell University, Hebrew University
+%           IBM Israel Science and Technology
+%    All rights reserved.
+%
+%    See ensemble/doc/license.txt for further information.
+%
+%*************************************************************%
+\section{Quick Installation} 
+
+Several demonstration applications are included with \ensemble.
+These can give a sense of the kinds of facilities provided by group
+communication to those who have not used a group communication
+toolkit before.  The demos can also serve as starting points for
+building new applications.  These applications are briefly described
+here along with how to execute them and the various command-line
+options and environment variables they use.
+
+\subsection{Compiling}
+Please see the file \sourcecode{ensemble/INSTALL.htm} for instructions on
+installing \ensemble\ if you have not done so already.
+
+\subsection{Configuration Variables}
+Detailed information is given in Section~\ref{subsect:config} for
+initializing environment variables. We assume that you will be using
+IP-multicast as a communication substrate this means no configuration
+is neccessary. However, if multicast is not supported by your system you'll
+be using the gossip server for processes to locate each
+other, see Section~\ref{subsect:config} for more information.
+
+Throughout this tutorial, we assume you are using the Unix csh or
+tcsh shell. To set an environment variable in the bash shell you would
+do the following:
+\begin{verbatim}
+% export ENS_CONFIG_FILE=/etc/ensemble.conf
+\end{verbatim}
+If you're using a win32 system you will need to use the native
+environment-setting tool
+(start $\rightarrow$ setting $\rightarrow$ control-panel $\rightarrow$ system $\rightarrow$ advanced $\rightarrow$ environment-variables)
+ which provides similar functionality. 
+
+\subsection{Executing Applications}
+On the same or other hosts execute several instances of an
+application, such as \sourcedemo{mtalk}:
+\begin{verbatim}
+% mtalk
+ ...
+\end{verbatim}
+
+Applications should merge together and form a group. 
+
+Mtalk is a {\it server-based} program, this means that it is really on
+the server-side, not a client application. Mtalk is useful for testing
+if servers on different machines can talk to each other and merge to
+form groups. We discourage users from writing server-side programs, it
+is easier and safer to write client-side programs. 
+
+
+

@@ -1,0 +1,217 @@
+# -*- Mode: makefile -*- 
+#*************************************************************#
+#
+# CONFIG.NMK: This set of definitions is included at the
+# beginning of the makefiles to define configurable
+# compilation parameters.  For NT.
+#
+# Authors: Mark Hayden, Robbert vanRenesse, 4/96
+# Changes: Ohad Rodeh, 11/2001 
+#
+#*************************************************************#
+# PLATFORM describes the Unix platform you are using.  This
+# is used to differentiate machine dependent files.  On Unix
+# platforms (without the Socket library) there are no
+# machine-dependent files for the bytecode version of
+# Ensemble, so these do not need to be set.  The default is
+# to use the GNU "standards" of machine_name-os_name.  If
+# you are using the tcsh shell, then the environment
+# variables MACHTYPE and OSTYPE will be set correctly for
+# your platform and you can use the defaults.  On NT,
+# PLATFORM should be set to be 'nt'.
+!include $(ENSROOT)\mk\env.nmk
+
+# !NOTE! make sure there are no trailing spaces on the next line
+
+# The binary and library directories
+#
+ENSLIB = $(ENSROOT)\lib\$(PLATFORM)
+ENSBIN = $(ENSROOT)\bin\$(PLATFORM)
+KIND = nt
+#*************************************************************#
+# C Compilation macros.  Used for compiling Socket library
+# and the C interface.  Ensemble has been compiled with gcc
+# and acc on SunOS4, Solaris, and Aix.  With cl on NT.
+
+# C compiler to use
+CC	= cl /nologo
+#*************************************************************#
+
+#CRYPTO = 1
+
+!ifdef CRYPTO
+# with cryptographich support. We're using Xavier's CryptoKit library
+# written natively in OCaml.
+CRYPTO_LINK = nums$(CMAS) cryptokit$(CMAS) $(ENSLIB)\crypto$(CMAS)
+!else
+# no crypto by default
+CRYPTO_LINK = 	$(ENSLIB)\crypto_fake$(CMAS)
+!endif
+
+#*************************************************************#
+
+# MSDEV: points to the MSDEV directory
+MSDEV_INCLUDE	= /I"C:\Program Files\Microsoft Visual Studio\VC98\Include"
+
+# CFLAGS: used for compilation of C files
+
+#DEBUG = 1
+
+CFLAGS	= \
+	-DINLINE=__inline \
+	$(MSDEV_INCLUDE) /I$(OCAML_LIB) \
+	/Ox /MT /W3 
+
+
+#	$(OPENSSL_INC)
+
+#*************************************************************#
+
+# LIBSYS: used for linking executables
+LIBSYS	= -cclib WS2_32$(ARCS) 
+
+
+C_LINK  = WS2_32$(ARCS) 
+
+
+#*************************************************************#
+
+
+
+
+
+
+
+#*************************************************************#
+# FOR INITIAL CONFIGURATION, NOTHING BELOW HERE SHOULD NEED TO
+# BE EDITED.
+#*************************************************************#
+#*************************************************************#
+
+#*************************************************************#
+# There are 3 levels of libraries to use.  The core library
+# contains the minimal Ensemble library.  There is not enough
+# included to run any protocol stacks, so additional modules
+# need to be dynamically linked (so this cannot be used with
+# the native code libraries, and USE_DYNLINK must be set!).
+# The min library includes a minimal set of layers and other
+# stuff that can be used to run the default Ensemble protocol
+# stack and a a total ordering layer for using totally ordered
+# layers.  The full library contains everything not in the
+# previous two libraries.  The macro ENSLIBS_TYPE is used to
+# switch betwen these different configurations.  The default
+# value is "full", which is the safest (although largest)
+# version.
+
+# 'min' or 'full'
+# !NOTE! make sure there are no trailing spaces on the next line
+
+ENSLIBS_min  = $(ENSCORELIB) $(ENSMINLIB)
+ENSLIBS_full = $(ENSLIBS_min) $(ENSRESTLIB)
+
+# embedded macros don't work on NT
+#ENSLIBS_DEP	= $(ENSLIBS_$(ENSLIBS_TYPE)_$(COMPTYPE))
+#ENSLIBS	= $(DYNLINKSTUFF) $(ENSLIBS_DEP)
+ENSLIBS_DEP     = $(ENSLIBS_full)
+ENSLIBS         = $(ENSCORELIB) $(ENSMINLIB) $(ENSRESTLIB)
+
+#*************************************************************#
+# There are two different configurations of Ensemble.  For
+# Unix, the default is to use the Unix library.  
+# which configurations should be built.  ENSCONFDEP is the set
+# of Ensemble system modules being used.  ENSCONF also
+# includes O'caml modules and specifies whether -custom flag
+# should be used.
+
+# Socket library
+ENSCONFDEP_skt	= $(LINKTHR) $(LIBSOCKDEP) $(ENSLIBS)
+ENSCONF_skt	= $(CUSTOM) $(LIBUNIX) $(LIBSOCK) $(CRYPTO_LINK) $(ENSLIBS)
+
+# Unix library
+ENSCONFDEP_unix	= $(LINKTHR) $(LIBUSOCK) $(ENSLIBS)
+ENSCONF_unix    = $(CUSTOM) $(LIBUNIX) $(LIBUSOCK) $(CRYPTO_LINK) $(ENSLIBS) 
+
+ENSCONFDEP      = $(ENSCONFDEP_skt)
+ENSCONF		= $(ENSCONF_skt) 
+
+
+
+#*************************************************************#
+# OCAML_LIB should point to the library directory.  For
+# Unix, OCAML_LIB is only necessary for the socket library
+# and the C interface.  By default, it is set to the value
+# of the environment variable CAMLLIB, which normally is set
+# to the O'Caml library directory.  It is usually preferable
+# to set OCAML_LIB indirectly through the CAMLLIB
+# environment variable.  Be careful, $(OCAML_LIB)/caml needs
+# to identify the correct location of the config.h header
+# file.  A copy may also be found in ocaml/byterun, but you
+# do not want to use that version, because it may be
+# inconsistent with the installation you are using.
+
+OCAML_LIB	= $(OCAMLLIB)
+
+#*************************************************************#
+# A bunch of configuration macros to support both NT and Unix
+
+EXE	= .exe
+OBJS	= .obj
+ARCS    = .lib
+OBJ	= $(OBJS)
+ARC	= $(ARCS)
+CP	= copy
+MV	= move
+LN	= copy			# use copy instead
+RM      = -del /Q /F
+RM_REC	= -del /S
+MAKE	= nmake -f Makefile.nt
+MKLIB	= lib /nologo /debugtype:CV
+MKLIBO  = /out:
+
+# Relative library paths 
+# For example, instead of:
+#     libce.lib
+# We have:
+#      $(LIB_PREF)ce$(LIB_SUFF)
+LIB_PATH = -link /LIBPATH:
+LIB_PREF = lib
+LIB_SUFF = .lib
+
+#*************************************************************#
+## Shared libraries, DLLs on win32
+
+MKSHRLIB   = link /nologo /dll #/FORCE /INCREMENTAL:NO
+MKSHRLIBO   = /out:
+SO = .dll
+#*************************************************************#
+RANLIB  = echo			# not needed on NT
+SUBMAKE = & $(MAKE)           #SUBMAKE = "& echo"
+DEPEND  = .depend.nt
+PARTIALLD = lib /nologo /debugtype:cv
+PARTIALLDO  = /out:
+OBJRULE = /Fo
+ECHO	= echo
+STRIP   = echo
+MKDIR   = -mkdir
+RMDIR   = -rmdir /S /Q
+CHMODR  = attrib +R
+#*************************************************************#
+# How to link various Ocaml libraries.  Should not require
+# modification.
+LIBCUNIX	= $(OCAML_LIB)\libunix$(ARCS)
+LIBMLUNIX	= unix$(CMAS)
+LIBCSOCK	= $(ENSLIB)\libsock$(ARC) 
+LIBMLSOCK	= $(ENSLIB)\ssocket$(CMA)
+LIBSOCK		= $(LIBMLSOCK) -cclib $(LIBCSOCK) #-cclib WS2_32$(ARCS)
+
+#*************************************************************#
+
+# Clean this directory
+#
+CLEANDIR = \
+    $(RM) .nfs* *.cm* *.ppo .err a.out *.o *.exe *.obj *.a *.lib *.asm *~ .*~ core *.pdb core gmon.out camlprim* *.exp *.dll *.idb
+
+#*************************************************************#
+
+
+

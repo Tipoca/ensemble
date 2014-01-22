@@ -1,0 +1,52 @@
+     RELEASE_NOTES for Ensemble version 2.00
+
+Author: Ohad Rodeh
+Last updated: 11/April/2004
+
+RELEASE_NOTES
+
+  This release includes a rewrite of:
+  (a) all client and external API code
+  (b) the IO subsysm
+  (c) the iovector memory subsystem
+  (d) a migration to a different cryptographic library. 
+
+  This release is -not- backwards compatible, it does not support:
+  (a) Maestro
+  (b) inboard modes (C or java)
+  (c) some of the more exotic stack operations
+  (d) TCP mode
+
+  This release includes a migration away from the various inboard
+  modes we were supporting earlier. An inboard mode is one where user
+  code, written in a language such as C or Java is linked with the
+  core Ensemble code which is written in OCaml. These modes caused a
+  lot of problems and were hard to support; they did not justify the
+  performance gains they promised. Therefore, we do not support them
+  any longer. Instead, all user-code should be written in a client
+  application that connects to an Ensemble daemon through a
+  socket. This release includes clients for C, Java, and .NET
+  (c-sharp).
+
+  The IO subsystem and memory management subsystem were rewritten and
+  provide better performance with a cleaner code base.
+
+  Instead of using OpenSSL this release uses the CryptoKit library
+  writtenw by Xavier Leroy. CryptoKit is written in OCaml which
+  simplifies a lot of the code that is needed to support it.
+
+  From this release on, we will not support a lot of stuff that had
+  been supported before. For example, Maestro. The focus is on more
+  limited functionality that is better tested.
+
+OCAML COMPILER VERSION
+  We are using version 3.08 for this version. 
+
+PORTABILITY
+  This version was tested on Linux (SUSE 8.2, i386 architecture) and
+  windows XP. It -should- work on any Unix system, though this has not
+  been tested.
+
+
+
+

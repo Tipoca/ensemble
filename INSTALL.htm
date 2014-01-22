@@ -1,0 +1,473 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+<title>Ensemble Installation Instructions</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF">
+
+<center>
+<h1>Ensemble 2.00</h1></center>
+
+<center><h2>
+Release Notes and Installation Instructions
+</h2></center>
+
+<center>Copyright &copy;1997 Cornell University, Ithaca, NY, USA,
+Hebrew University 2000, Jerusalem Israel, 
+IBM Israel Science and Technology 2002
+<br>All rights reserved.</center>
+
+<br><i>Maintainer</i>:
+<a href="mailto:orodeh@il.ibm.com">Ohad Rodeh</a>,
+<hr><a NAME="intro"></a>
+<h2>Introduction</h2>
+<p>
+Thank you for choosing Ensemble as your message transport system. Its
+platform independence allows you to interconnect a wide range of
+computing environments.
+<p>
+The following instructions guide you through the process of installing
+Ensemble. Click on the hypertext links for the details about each step.
+The installation instructions are designed to be as simple as possible.
+However, please read them through carefully before starting and follow
+them carefully. Also, please read the file <b>RELEASE_NOTES</b> for
+the latest information on this release.
+<p>
+These installation instructions are aimed at getting Ensemble up and
+running on your system as quickly as possible. After successfully
+installing the system, you may wish to compile Ensemble for the
+native instruction set of your computer. The difference is
+only significant when Ensemble is used in high-performance settings.
+
+<p>
+<hr>
+<a NAME="software"></a>
+<h2>Required Software</h2>
+<p>
+To compile Ensemble you need <b>Version 3.07</b> of the Objective
+Caml (O'Caml) compiler. For unix systems, you also need the make
+version by GNU, also known as GNU-make. For windows, you'll need the
+Visual Studio compiler verion 6 and the nmake tool.
+
+<p>
+O'Caml is freely available via the World Wide Web at <b><a
+href="#ocaml">http://caml.inria.fr/ocaml/</a></b>.  Please ensure
+you have the correct version. See the instructions below on how to
+obtain it. 
+
+<p>
+On Unix platforms, to compile the C interface, you'll need a POSIX
+compliant threads package. (On Solaris and HPUX you can use the native
+threads library). On windows you'll need the visual-C toolkit. 
+To compile the java client, you'll need a java compiler and runtime system. 
+For the C-sharp code you'll need a .Net environment. 
+
+On windows, to build the optimized versions the server you will also
+need the masm (MS Compatibility Driver) and ml (MS Macro Assembler)
+executables installed and located in your path.
+
+
+<p>
+<hr>
+<a NAME="licensing"></a>
+<h2>Licensing</h2>
+<p>
+Ensemble code has a BSD-type license. It is copyrighted by Cornell,
+the Hebrew universitie, and IBM research. Ensemble is freely available software,
+but you must agree to the terms of the license before you can install
+it. We ask that you read the licensing agreement before installing
+Ensemble.  It can be found in <b>ensemble/LICENSE</b>.
+<p>
+<hr>
+
+<a NAME="installation"></a>
+<h2>Installation</h2>
+
+In order to compile the system you'll need to setup some environment
+variables. These will help tell the build-scripts which operating
+system you're using and where to find the OCaml libraries. 
+
+<ul>
+  <li>
+      Make sure the Ocaml binaries are in your <b>PATH</b>.
+  <li>
+      Set the <b>OCAMLLIB</b> environment variable to the directory where you
+      installed the O'Caml libraries. O'Caml will give you the correct value
+      for this if you type:
+      <pre>
+      &nbsp;&nbsp;&nbsp; % ocamlc -v
+      &nbsp;&nbsp;&nbsp; The Objective Caml compiler, version 3.07
+      &nbsp;&nbsp;&nbsp; Standard library directory: /usr/local/lib/ocaml
+      </pre>
+      The second line printed out by this is the location where O'Caml installed
+      the libraries. In sh, you set the OCAMLLIB variable like this:
+      <pre>
+      &nbsp;&nbsp;&nbsp; OCAMLLIB=/usr/local/lib/ocaml
+      &nbsp;&nbsp;&nbsp; export OCAMLLIB
+      </pre>
+      We recommend you add these to your '.tcshrc' or equivalent for your shell.
+
+      If you have some other version, then obtain version 3.07 and install
+      it.  O'Caml is freely available from <a
+      href="http://caml.inria.fr/ocaml">http://caml.inria.fr/ocaml</a>
+      and is easy to install (precompiled binaries are available for
+      Windows NT). You do not need the native code compiler, although you
+      can compile Ensemble with it.
+</ul>
+
+<p> Install Ensemble by following the step-by-step instructions. You
+need to get the O'Caml compiler, <a href="#download">extract</a> the
+Ensemble software, and then compile the portions you wish to
+use. Installation for WIN32 and Unix platforms is similar, the
+difference being that on windows one needs to use 'nmake -f
+Makefile.nt' instead of 'make'.
+
+<a NAME="download"></a>
+<h2>How to download and extract the Ensemble software</h2>
+<p>
+Download Ensemble from <a href="http://www.cs.cornell.edu/Info/Projects/Ensemble/ftp.html">http://www.cs.cornell.edu/Info/Projects/Ensemble/ftp.html</a>.
+Ensemble is no longer encrypted. Simply unzip and untar the distribution.
+It will put the sources in a directory called "ensemble". On Windows NT
+you can use the winzip program. On Unix platforms, do it this way:
+<pre>
+&nbsp;&nbsp;&nbsp; # uncompress and untar the distribution
+&nbsp;&nbsp;&nbsp; gunzip ensemble-2_00.tar.gz
+&nbsp;&nbsp;&nbsp; tar xvf ensemble.tar
+</pre>
+<p>
+<hr>
+
+<h2>Building Ensemble</h2>
+Ensemble is supported on Unix (and Unix like systems), and win32
+platforms. It is tested mainly on Linux and WinXP, but also on
+sparc-solaris, HP-UX, NT4, WIN2000.
+
+<p>
+Configure the system. If this is a win32 platform, then there is nothing to do and you can skip this stage. Otherwise, do a
+<pre>
+&nbsp;&nbsp;&nbsp; ./configure
+</pre>
+
+From the Ensemble top-level directory. This will compute your system
+settings and write them into the mk/env.mk file. If the settings have
+not been computed correctly you can alter them by hand at this point
+by editting mk/env.mk. The PLATFORM variable is composed of a
+machine-type and the operating-system type. The machine-type should be
+one of: sparc, i386, rs6000, alpha. The os-type should be one of:
+solaris, aix, hpux, linux, osf1. For example, on a standard linux OS
+with an intel CPU PALTFORM should be i386-linux.
+
+Compile the Ensemble system and demonstration programs as follows:
+<pre>
+&nbsp;&nbsp;&nbsp; # make the Ensemble system dependencies
+&nbsp;&nbsp;&nbsp; # directory: ensemble
+&nbsp;&nbsp;&nbsp; make depend
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; # make the system
+&nbsp;&nbsp;&nbsp; make all
+</pre>
+
+If all went smoothly, the initial installation is now complete, and
+you can try out the ensemble-daemon. The client-libraries and
+mtalk-demo have also been compiled. To compile the additional tests
+you'll need to do a <pre>make tests</pre> as well.
+
+You can also compile for your native instruction set. <a
+href="#native">instruction set</a>. In order to
+clean up the object files do:
+<pre>
+&nbsp;&nbsp;&nbsp; # clean up
+&nbsp;&nbsp;&nbsp; # directory: ensemble
+&nbsp;&nbsp;&nbsp; make clean
+</pre>
+This will leave only the binaries (in bin/PLATFORM) and libraries (in lib/PLATFORM).
+
+<p> The build process automatically builds the C client. To build the java client do
+<pre>
+&nbsp;&nbsp;&nbsp; # directory: ensemble
+&nbsp;&nbsp;&nbsp; cd client/java
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; # make the system
+&nbsp;&nbsp;&nbsp; make all
+</pre>
+
+To build the C-sharp code you'll need to startup a .Net development
+environment and build the code in client/cs/ENS.
+
+<p>
+<h3>How to run applications</h3>
+
+There is one demo program implemented in several different languages,
+it is called mtalk for multi-person talk. Basically, you run several
+several instances of the mtalk demo and see how they merge to form a
+group. Each member can send messages to all the other members. The
+current membership is delivered to each member.
+
+<ul>
+  <li> mtalk.ml: The server version of the demo. Implemented on top of the server
+       itself. 
+  <li> c_mtalk.c: C-client version of the demo. The ensemble-daemon needs to run on each
+       participating machine.
+  <li> Mtalk.java: Java version of the demo. Similar to the C-client. 
+  <li> Mtalk.cs: C-sharp version of the demo. Similar to the C-client. 
+</ul>
+
+To use java Mtalk application you'll need to set the classpath to
+include the ensemble.jar file installed in PLATFORM/lib. Something
+like:
+<pre>
+java Mtalk.java -classpath=".:PLATFORM/lib/ensemble.jar"
+</pre> 
+should work.
+
+<p> For the rest of the applications, you'll need to refer to the
+tutorial, <b>ensemble/doc/tut.pdf</b>, for instructions on executing
+the other applications and tests. 
+
+<a NAME="native"></a>
+<h3>Building the native code version</h3>
+<p>
+Compilation for your native instruction set results in faster code,
+and reduction in memory use. This step compiles all of the Ensemble
+sources and will take a while.
+<pre>
+&nbsp;&nbsp;&nbsp; # make the Ensemble system dependencies
+&nbsp;&nbsp;&nbsp; # directory: ensemble
+&nbsp;&nbsp;&nbsp; make depend
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; # build native code libraries
+&nbsp;&nbsp;&nbsp; # directory: ensemble
+&nbsp;&nbsp;&nbsp; make opt
+</pre>
+
+<h3>Installation is complete</h3>
+<p>
+This concludes the instructions for building Ensemble on Unix systems.
+<br>
+
+<hr>
+<a NAME="multiple-platforms"></a>
+<h2>Building Ensemble on Multiple Platforms</h2>
+<p>
+Multiple versions of Ensemble can co-exist within the same directory
+tree.  All platform-dependent files now have a separate directory
+describing the platform for which they were compiled. For Unix
+platforms, you just need to ensure that the <b>PLATFORM</b> 
+variables has been correctly set by the configure script. For Windows
+the name of the platfrom ('nt') is embedded in the Windows NT
+makefiles and does not need to be set. For instance, the
+platform-independent bytecode library for Ensemble is called
+'libens.cma' ('cma' is the O'Caml suffix used for bytecode
+libraryies). The platform-dependent, native code library for Ensemble
+on i386, Linux platforms is called
+'<b>lib/i386-linux/libens.cmxa</b>' ('cmxa' is the O'Caml suffix for
+native code libraries).
+
+<p> All the demos are install in </b>bin/PLATFORM</b>, this includes
+the ensemble server, C-client, and java-client tests and demos.
+
+<p>
+This concludes the instructions for building Ensemble on multiple platforms.
+<br>
+
+<h2>"Make Clean" </h2>
+<p>
+Calling 'make clean' from the top-level directory will erase all
+object files in the system, and leave just the libraries and
+executables in the <b>lib</b> and <b>bin</b> directories. Calling
+'make realclean' will erase these as well. When compiling for multiple
+platforms make sure to call 'make clean' between builds. 
+
+<hr>
+<h2>SECURITY</h2>
+<p>
+Ensemble supports several security properties, including user
+message encryption, authentication, and group member
+authorization. Ensemble requires the user to install <a href =
+"http://web.mit.edu/network/pgp.html">PGP6.5</a>  and
+<a href ="http://pauillac.inria.fr/~xleroy/software.html">CryptoKit 1.2</a>.
+Previous version of PGP (2.6.3, 5.0) also work, however, we have
+had correctness probelms with them. 
+In order to make ensemble with cryptographic support, <b>FIRST, you
+must edit mk/config.mk.</b> You will set the CRYPTO variable to 1, its
+value is zero by default. This will now link in the crypto
+libraries when you build executables. Now perform the following steps:
+
+Unix:
+<pre>
+&nbsp;&nbsp;&nbsp; # Make the regular crypto library
+&nbsp;&nbsp;&nbsp; # directory: ensemble
+&nbsp;&nbsp;&nbsp; make 
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; # Make the optimized crypto library
+&nbsp;&nbsp;&nbsp; # directory: ensemble
+&nbsp;&nbsp;&nbsp; make opt
+</pre>
+<b>NOTE:</b> on NT, change "make" to:</pre>
+"nmake -f Makefile.nt"
+and things should compile smoothly.
+<br>
+<p>
+
+
+<h2> Testing CRYPTO </h2> In order to check that your system can
+use the various cryptographic libraries and interfaces, use the the
+armadillo program in the demo directory. 
+
+In order to set up PGP you'll need to use (at least) the following
+command:
+<pre>
+&nbsp;&nbsp;&nbsp; pgp -kg
+</pre>
+This will generate a public/private key pair for a principal of your
+choice. The key-pairs are stored in your home directory under the
+subdirectory <i>.pgp</i>. Armadillo requires that the principals
+<i>o1,o2</i> are installed. To see the set of principals you currently
+use:
+<pre>
+&nbsp;&nbsp;&nbsp;pgp -kv
+&nbsp;&nbsp;&nbsp;pub   512/2F045569 1998/06/15 o2
+&nbsp;&nbsp;&nbsp;pub   512/A2358EED 1998/06/15 o1
+&nbsp;&nbsp;&nbsp;2 matching keys found.
+</pre
+
+use:
+<pre>
+&nbsp;&nbsp;&nbsp; armadillo -prog pgp 
+</pre>
+To test the PGP interface. You should see something like:
+<pre>
+&nbsp;&nbsp;&nbsp;PGP works
+&nbsp;&nbsp;&nbsp;check_background
+&nbsp;&nbsp;&nbsp;got a ticket
+&nbsp;&nbsp;&nbsp;background PGP works
+</pre>
+
+On NT, PGP only works in the foreground, in the background due to
+socket select issues. 
+
+If something is broken, trace the PGP execution using:
+<pre>
+&nbsp;&nbsp;&nbsp; armadillo -prog pgp -trace PGP 
+</pre>
+If more information is required use the flags:
+<pre>
+&nbsp;&nbsp;&nbsp;-trace PGP1 -trace PGP2
+</pre>
+
+For a wider scale test use the <i>exchange</i> program. This is a test
+that creates a set of endpoints, with principal names: <i>o1, o2,
+..</i>, and merges them securely together into one group. Each group
+merge requires that group-leaders properly authenticate themselves
+using PGP. The test is started with all members in components containing
+themselves, and ends when a single secure component is created. 
+Note that it will keep running until reaching the timeout. The timeout
+is set by default to 20 seconds. 
+To invoke the test do:
+<pre>
+&nbsp;&nbsp;&nbsp; armadillo -prog exchange -n 2 
+</pre>
+To use more endpoints, increase the <i>-n</i> command line argument,
+and add more principals to your PGP database.
+
+If something goes wrong, a trace of the authentication protocol is
+available through <pre> -trace EXCHANGE</pre>. 
+
+
+To test security with two separate processes do the following:
+<pre>
+&nbsp;&nbsp;&nbsp;#setup and run gossip
+&nbsp;&nbsp;&nbsp;gossip &
+&nbsp;&nbsp;&nbsp;#On one machine run:
+&nbsp;&nbsp;&nbsp; mtalk -key 11112222333344441111222233334444 -add_prop Auth -pgp o1
+&nbsp;&nbsp;&nbsp;#On a second machine run:
+&nbsp;&nbsp;&nbsp; mtalk -key 01234567012345670123456701234567 -add_prop Auth -pgp o2
+</pre>
+The two mtalk processes should authenticate each other and merge.
+
+The three command line arguments specify:
+<ul>
+  <li> -key 111122223333444111122223333444 : The initial security key of the
+      system. Should be a 32 byte string.
+  <li> -add_prop Auth: Add the authentication protocol.
+      Otherwise, stacks with different keys will not be able to
+      merge. 
+  <li> -pgp o1: Specify the principal name for the system.
+</ul>
+
+<h3> Performance issues with PGP</h3>
+The way Ensemble uses PGP is not very efficient at the
+moment. However, this only effects authentication, which occurs rarely. 
+Common operations such as Diffie-Hellman exchanges, symmetric encrtyption/decryption, and MD5 hashing are performed using the OpenSSL toolkit. 
+
+<a NAME="env_glossary"></a>
+<h3> Configuration and environment variables</h3>
+Here is a list of environment variables that one needs to set for
+Ensemble to compile correctly.
+
+<pre>
+# where the source distribution of Java is located. Used to compile
+# the CEJava and EJava
+setenv JAVA_HOME 
+
+# where the Ensemble configuration file is located
+setenv ENS_CONFIG_FILE $HOME/.ensemble
+</pre>
+
+<p> There are many configuration options for the system's runtime. They
+have all been moved into a configuration-file so as not to cluter the
+environment variable system. Below is an example that includes the
+default values. Note that the configuration file is optional and the
+system will run with the defaults correctly. 
+
+<pre>
+# The set of communication transports.
+ENS_MODES=DEERING 
+
+# The user-id
+ENS_ID=orodeh
+
+# The port number used by the system
+ENS_PORT=6789
+
+# The port number of the gossip service
+ENS_GOSSIP_PORT=6788
+
+# The set of gossip hosts.
+ENS_GOSSIP_HOSTS=localhost
+
+# The set of groupd hosts
+ENS_GROUPD_HOSTS=localhost
+
+#the port number of the group-daemon service
+ENS_GROUPD_PORT=6790
+
+#The port used for IP-multicast
+ENS_DEERING_PORT=6793
+</pre>
+
+<p> The additional configuration below is for PGP
+<pre>
+#The pgp password
+ENS_PGP_PASS=Wild Boar
+
+#The pgp version used (2.6,5.0,6.5)
+ENS_PGP_VERSION=2.6
+</pre>
+
+The format of the configuration file is:
+<pre>
+# comment line
+key = value
+# empty lines are also acceptable
+
+</pre>
+
+<br>
+<hr>
+<br>
+</body>
+<!-- hhmts start -->
+Last modified: Mon Apr 12 10:40:27 IDT 2004
+<!-- hhmts end -->
+</html>

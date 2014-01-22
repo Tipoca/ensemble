@@ -1,0 +1,217 @@
+%*************************************************************%
+%
+%    Ensemble, 2_00
+%    Copyright 2004 Cornell University, Hebrew University
+%           IBM Israel Science and Technology
+%    All rights reserved.
+%
+%    See ensemble/doc/license.txt for further information.
+%
+%*************************************************************%
+\section{C Application Interface}
+The C-language API is similar in nature to the Java/C-sharp APIs. This
+section assumes the reader is already familiar with that material. 
+
+The main addition for C is the careful description of who allocates
+which memory. 
+
+In order for an application to start using Ensemble it needs to
+initialize a connection structure:
+\begin{codebox}
+ens_conn_t *ens_Init(void);
+\end{codebox}
+
+The {\tt ens\_Init} call allocates and initializes an {\tt ens\_conn\_t}
+structure that encapsulates a local socket connection to the Ensemble
+Server. All operations require the connection structure. Only one
+connection is needed for an application. 
+
+The application needs to poll the connection periodically to see if it
+has pending messages. 
+
+\begin{codebox}
+typedef enum ens_rc_t {
+    ENS_OK = 0,        
+    ENS_ERROR = 1
+} ens_rc_t;
+
+ens_rc_t ens_Poll(ens_conn_t *conn, int milliseconds, /*OUT*/ int *data_available);
+\end{codebox}
+
+{\tt ens\_Poll} returns an {\tt ens\_rc\_t} return type which conveys
+whether the operations was successful or not. Poll takes a connection,
+and a number of milliseconds to wait for input on the socket. It is a
+blocking call, as is the rest of the API. If data is available the out
+argument: {\tt data\_available} will be set to 1; if no data is
+available it will be set to 0. 
+
+In order to Join a group the {\tt ens\_Join} call should be used. 
+\begin{codebox}
+ens_rc_t ens_Join(
+    ens_conn_t *conn,
+    ens_member_t *memb,
+    ens_jops_t *ops,
+    void *user_ctx
+    ) ;
+\end{codebox}
+
+Join takes a connection, a member structure, a set of join-options and
+a opaque pointer for the user's use. It initializes the member
+structure, attaches the user-context to it, and sends a Join request
+to Ensemble. The set of allowed join-options is: 
+
+\begin{codebox}
+typedef struct ens_jops_t {
+    char group_name[ENS_GROUP_NAME_MAX_SIZE] ; /* The group name */
+    char properties[ENS_PROPERTIES_MAX_SIZE] ; /* The set of properties */
+    char params[ENS_PARAMS_MAX_SIZE] ;         /* The set of parameters */
+    char princ[ENS_PRINCIPAL_MAX_SIZE] ;       /* My principal name (security) */
+    int secure ;                               /* Do we want a secure stack (encryption + authentication? */
+} ens_jops_t ;
+\end{codebox}
+
+The user can choose the group-name, set of properties expected from
+the group, and a set of additional configuration parameters. The
+default values for properties is {\tt ENS\_DEFAULT\_PROPERTIES}, the
+additional set of parameters should be empty for normal use. There are
+two parameters used for security: the principal name, and the secure
+flag. If one is not intersted in security, simply set the secure flag
+to zero. If the flag is set to one, then the principal name in PGP 
+should be specified. The principal names for users are used for
+authentication purposes; only authenticated users are allowed into a
+secure group. 
+
+After joining a group there are several operations that are allowed on
+it: Leave, Send1, Send, Cast, Suspect, and BlockOk. All these calls
+are (a) blocking, they return only after the whole data has been
+written to the socket (b) thread-safe: they may be used from any
+application thread.
+
+To leave a group use the {\tt ens\_Leave} call. 
+\begin{codebox}
+ens_rc_t ens_Leave(
+    ens_member_t *memb
+    ) ;
+\end{codebox}
+After the call the member structure becomes invalid and cannot be used
+for any other operations. 
+
+Point-to-point and multicast messages can be send with three different calls: 
+\begin{codebox}
+ens_rc_t ens_Cast(
+    ens_member_t *memb,
+    int len, 
+    char *buf
+    ) ;
+
+ens_rc_t ens_Send(
+    ens_member_t *memb,
+    int num_dests,
+    int *dests,
+    int len, 
+    char* buf
+    ) ;
+
+ens_rc_t ens_Send1(
+    ens_member_t *memb,
+    int dest,
+    int len, 
+    char* buf
+    ) ;
+\end{codebox}
+For the above three calls The data is not freed nor allocated by the
+Ensemble client. The user needs to manager memory that is
+sent. Maximal message size is 32K. The maximal number of destinations
+is 10.
+
+Report specified group members as failure-suspected. The maximal
+number of suspects is 10. 
+\begin{codebox}
+ens_rc_t ens_Suspect(
+    ens_member_t *memb,
+    int num,
+    int *suspects
+     );
+\end{codebox}
+
+Tell the system we will no longer send messages in this view. Should
+be sent as a reponse to a Block message.
+\begin{codebox}
+ens_rc_t ens_BlockOk(
+    ens_member_t *memb
+    ) ;
+\end{codebox}
+
+Messages can be received by the {\tt ens\_RecvMetaData} call together
+with {\tt ens\_RecvView} and {\tt ens\_RecvMsg}. 
+
+When there is data on the connection the {\tt ens\_RecvMetaData} tells
+which type of message has arrived and how much memory needs to be
+allocated for receiving it. 
+
+\begin{codebox}
+typedef enum ens_up_msg_t {
+    VIEW = 1,      /* A new view has arrived from the server. */
+    CAST = 2,      /* A multicast message */
+    SEND = 3,      /* A point-to-point message */
+    BLOCK = 4,     /* A block requeset, prior to the installation of a new view */
+    EXIT = 5       /* A final notification that the member is no longer valid */
+} ens_up_msg_t;
+
+typedef struct ens_msg_t {
+    ens_member_t *memb;        /* endpoint this message blongs to */
+    ens_up_msg_t mtype ;       /* message type */
+    union {
+	struct {               /* The variant for VIEW: */
+	    int     nmembers;  /* the number of members in a view */    
+	} view;
+	struct {               /* The variant for a point-to-point message */
+	    int     msg_size;  /* length of a bulk-data */
+	} send;
+	struct {               /* The variant for multicast message */
+	    int     msg_size;  /* length of a bulk-data */
+	} cast;
+    } u;
+} ens_msg_t;
+
+
+ens_rc_t ens_RecvMetaData(ens_conn_t *conn, ens_msg_t *msg);
+\end{codebox}
+
+{\tt ens\_RecvMetaData} is a blocking call, therefore, it needs to be
+executed only after the user knows there is pending data on the
+socket. The user needs to pre-allocate an {\tt ens\_msg\_t} structure
+which is used to store meta-information about the in-coming message: 
+\begin{itemize}
+\item which member is this message for? 
+\item what type is the message?
+  view, point-to-point message, multicast message, block, or exit.
+\item For each type, how much memory is required to receive it. 
+\end{itemize}
+
+The next step is to call {\tt ens\_RecvView} for a view-message, and
+{\tt ens\_RecvMsg} for a bulk-data message. 
+
+\begin{codebox}
+ens_rc_t ens_RecvView(ens_conn_t *conn, 
+                      ens_member_t *memb,
+                      /*OUT*/ ens_view_t *view);
+
+ens_rc_t ens_RecvMsg(ens_conn_t *conn, 
+                     /*OUT*/ int *origin, char *buf);
+\end{codebox}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
